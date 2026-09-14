@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Taman Senandika - Untuk Istriku Tersayang</title>
+    <style>
+      * {
+        box-sizing: border-border;
+        margin: 0;
+        padding: 0;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      body {
+        background: linear-gradient(180deg, #a1c4fd 0%, #c2e9fb 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #4a4a4a;
+      }
+
+      .game-container {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(8px);
+        padding: 25px;
+        border-radius: 24px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 450px;
+        text-align: center;
+      }
+
+      h1 {
+        color: #6b5b95;
+        font-size: 1.8rem;
+        margin-bottom: 5px;
+      }
+
+      p.subtitle {
+        font-size: 0.9rem;
+        color: #888;
+        margin-bottom: 20px;
+      }
+
+      .garden-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+        margin-bottom: 20px;
+      }
+
+      .pot {
+        background: #fff;
+        border: 2px dashed #b8c6db;
+        border-radius: 16px;
+        padding: 20px 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 140px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+      }
+
+      .pot:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        border-color: #f6d365;
+      }
+
+      .flower-icon {
+        font-size: 3rem;
+        margin-bottom: 8px;
+        transition: transform 0.3s ease;
+      }
+
+      .pot:hover .flower-icon {
+        transform: scale(1.1);
+      }
+
+      .pot-label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #6b5b95;
+      }
+
+      .water-btn {
+        margin-top: 8px;
+        background: #fda085;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        cursor: pointer;
+        font-weight: bold;
+      }
+
+      .water-btn:hover {
+        background: #f6d365;
+      }
+
+      /* Modal / Pop-up Kenangan */
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        justify-content: center;
+        align-items: center;
+        z-index: 100;
+        padding: 20px;
+      }
+
+      .modal-content {
+        background: white;
+        padding: 25px;
+        border-radius: 20px;
+        max-width: 350px;
+        width: 100%;
+        text-align: center;
+        animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      }
+
+      @keyframes popIn {
+        from {
+          transform: scale(0.8);
+          opacity: 0;
+        }
+        to {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      .modal-title {
+        color: #e84393;
+        font-size: 1.2rem;
+        margin-bottom: 10px;
+      }
+
+      .modal-img {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+        border-radius: 12px;
+        margin-bottom: 12px;
+        display: none; /* Muncul jika ada gambar */
+      }
+
+      .modal-text {
+        font-size: 0.95rem;
+        color: #555;
+        line-height: 1.5;
+        margin-bottom: 15px;
+        font-style: italic;
+      }
+
+      .close-btn {
+        background: #6c5ce7;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 12px;
+        cursor: pointer;
+        font-weight: bold;
+      }
+
+      /* Audio Control */
+      .audio-control {
+        margin-top: 15px;
+        font-size: 0.8rem;
+        color: #777;
+      }
+
+      .btn-music {
+        background: none;
+        border: 1px solid #777;
+        border-radius: 50px;
+        padding: 4px 12px;
+        cursor: pointer;
+        color: #555;
+        margin-top: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="game-container">
+      <h1>Taman Senandika 🌸</h1>
+      <p class="subtitle">Siram bunganya untuk membuka kenangan indah kita.</p>
+
+      <div class="garden-grid" id="garden">
+        <!-- Pot bunga di-render oleh JS -->
+      </div>
+
+      <div class="audio-control">
+        <span>🎵 Musik Latar Meditatif</span><br />
+        <button class="btn-music" id="musicBtn" onclick="toggleMusic()">
+          ▶️ Putar Musik
+        </button>
+      </div>
+    </div>
+
+    <!-- Modal Pop-up Pesan Cinta -->
+    <div class="modal" id="memoryModal">
+      <div class="modal-content">
+        <div class="modal-title" id="modalTitle">Bunga Mekar!</div>
+        <img src="" id="modalImg" class="modal-img" alt="Foto Kenangan" />
+        <p class="modal-text" id="modalText">
+          Pesan kenangan akan muncul di sini.
+        </p>
+        <button class="close-btn" onclick="closeModal()">Tutup & Simpan</button>
+      </div>
+    </div>
+
+    <!-- Audio Musik Santai Bebas Hak Cipta -->
+    <audio
+      id="bgMusic"
+      loop
+      src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=relaxing-piano-112299.mp3"
+    ></audio>
+
+    <script>
+      // =========================================================
+      // UBAH DATA DI BAWAH INI UNTUK MENGUSIK PESAN UNTUK ISTRI
+      // =========================================================
+      const memories = [
+        {
+          id: 1,
+          name: "Bunga Kasih Sayang",
+          icon: "🌱",
+          bloomedIcon: "🌹",
+          waterCount: 0,
+          maxWater: 3,
+          title: "Untuk Istriku Tersayang",
+          text: "Terima kasih sudah selalu ada di sisiku, menemani setiap langkah dan menjadi rumah terbaik tempatku pulang. Aku mencintaimu!",
+          image: "", // Isi URL foto kalian jika ada (contoh: "https://.../foto.jpg")
+        },
+        {
+          id: 2,
+          name: "Melati Kenangan",
+          icon: "🌱",
+          bloomedIcon: "🌻",
+          waterCount: 0,
+          maxWater: 3,
+          title: "Pengingat Kecil",
+          text: "Jangan lupa untuk beristirahat ya hari ini. Kamu sudah berusaha dengan sangat baik. Senyummu selalu jadi penyemangat terbesarku.",
+          image: "",
+        },
+        {
+          id: 3,
+          name: "Anggrek Impian",
+          icon: "🌱",
+          bloomedIcon: "🌷",
+          waterCount: 0,
+          maxWater: 3,
+          title: "Masa Depan Bersama",
+          text: "Bersamamu, masa depan bukan lagi hal yang menakutkan, tapi petualangan indah yang selalu aku tunggu setiap harinya.",
+          image: "",
+        },
+        {
+          id: 4,
+          name: "Bunga Abadi",
+          icon: "🌱",
+          bloomedIcon: "🌺",
+          waterCount: 0,
+          maxWater: 3,
+          title: "Janji Suami",
+          text: "Apapun yang terjadi, aku akan selalu berusaha membuatmu bahagia, mendengarkan ceritamu, dan menggandeng tanganmu.",
+          image: "",
+        },
+      ];
+
+      const gardenEl = document.getElementById("garden");
+      const modal = document.getElementById("memoryModal");
+      const bgMusic = document.getElementById("bgMusic");
+      const musicBtn = document.getElementById("musicBtn");
+
+      function renderGarden() {
+        gardenEl.innerHTML = "";
+        memories.forEach((item, index) => {
+          const isBloomed = item.waterCount >= item.maxWater;
+          const pot = document.createElement("div");
+          pot.className = "pot";
+          pot.innerHTML = `
+                    <div class="flower-icon">${isBloomed ? item.bloomedIcon : item.icon}</div>
+                    <div class="pot-label">${item.name}</div>
+                    ${
+                      !isBloomed
+                        ? `<button class="water-btn" onclick="waterFlower(${index})">💧 Siram (${item.waterCount}/${item.maxWater})</button>`
+                        : `<button class="water-btn" style="background:#2ecc71" onclick="showMemory(${index})">💌 Baca Pesan</button>`
+                    }
+                `;
+          gardenEl.appendChild(pot);
+        });
+      }
+
+      function waterFlower(index) {
+        memories[index].waterCount++;
+        if (memories[index].waterCount >= memories[index].maxWater) {
+          showMemory(index);
+        }
+        renderGarden();
+      }
+
+      function showMemory(index) {
+        const data = memories[index];
+        document.getElementById("modalTitle").textContent = data.title;
+        document.getElementById("modalText").textContent = `"${data.text}"`;
+
+        const imgEl = document.getElementById("modalImg");
+        if (data.image && data.image !== "") {
+          imgEl.src = data.image;
+          imgEl.style.display = "block";
+        } else {
+          imgEl.style.display = "none";
+        }
+
+        modal.style.display = "flex";
+      }
+
+      function closeModal() {
+        modal.style.display = "none";
+      }
+
+      function toggleMusic() {
+        if (bgMusic.paused) {
+          bgMusic.play();
+          musicBtn.textContent = "⏸️ Hentikan Musik";
+        } else {
+          bgMusic.pause();
+          musicBtn.textContent = "▶️ Putar Musik";
+        }
+      }
+
+      // Inisialisasi Tampilan
+      renderGarden();
+    </script>
+  </body>
+</html>
